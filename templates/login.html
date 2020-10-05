@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+    <p><b>Kirjaudu</b></p>
+
+    <form action="#" method="post">
+      <p><input type="hidden" name="login" value="login"/></p>
+      Käyttäjänimi:</br>
+      <p><input type="text" name="userName" /></p>
+      Salasana:</br>
+      <p><input type="text" name="passWord" /></p>
+      <p><input type="submit" value="Kirjaudu" /></p>
+    </form>
+
+    <form action="#" method="post">
+      <p><input type="hidden" name="logout" value="logout"/></p>
+      <p><input type="submit" value="Kirjaudu ulos" /></p>
+    </form>
+
+    {% if access == 'tokenError' %}
+      Kirjautuminen epäonnistui, yritä uudelleen
+    {% elif access == 'tokenNotUsedAnymore' %}
+      Olet kirjautunut ulos
+    {% elif access == 'couldNotExpireTheToken' %}
+      Uloskirjautumisessa tapahtui virhe
+    {% elif access == 'LoginOperationFailed' %}
+      Odottamaton virhe
+    {% else %}
+      Kirjautuminen onnistui
+
+    {% endif %}
+    <p>&nbsp;</p>
+    <div id="talleJokuSopivaIdMyohemmin">
+      <p><b>Rekisteröidy</b></p>
+      <form action="#" method="post">
+        <p><input type="hidden" name="newUser" value="newUser"/></p>
+        *Käyttäjänimi sähköpostimuodossa:</br>
+        <p><input type="text" name="userName" required /></p>
+        Kuva:</br>
+        <p><input type="text" name="imageUrl" /></p>
+        *Koko nimi:</br>
+        <p><input type="text" name="name" required /></p>
+        Organisaatio:</br>
+        <p><input type="text" name="organization" /></p>
+        *Salasana:</br>
+        <p><input type="text" name="passWord" required /></p>
+        Titteli:</br>
+        <p><input type="text" name="title" /></p>
+        <p><input type="submit" value="Rekisteröidy" /></p>
+      </form>
+
+      {% if access == 'userRegistrationSucceed' %}
+        Rekisteröityminen onnistui. Tarkkaile sähköpostiasi
+      {% elif access == 'userRegistrationFailed' %}
+        Rekisteröityminen epäonnistui. Tarkista tiedot ja yritä uudelleen
+      {% else %}
+
+      {% endif %}
+      <div>
+      <p style="font-size: 6px">{{ access }}</p>
+      <p style="font-size: 6px">{{ refresh }}</p>
+    </div>
+    </div>
+
+
+{% endblock %}

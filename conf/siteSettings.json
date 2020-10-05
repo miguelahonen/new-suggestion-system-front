@@ -1,0 +1,16 @@
+{
+	"apiBasePath": "http://localhost:8080/api/",
+	"secretKey": 123456,
+	"headerForLogin": {
+		"Content-type": "application/json",
+		"Accept": "application/json"
+	},
+	"headerForRegistration": {
+		"Content-type": "application/json",
+		"Accept": "application/json"
+	},
+	"commonHeader": {
+		"Content-type": "application/json",
+		"Accept": "application/json"
+	}
+}
