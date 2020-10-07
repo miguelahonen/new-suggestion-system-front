@@ -1,11 +1,81 @@
 {% extends 'base.html' %}
-{% block title %}Pääsivu{% endblock %}
+{% block title %}Suggestions{% endblock %}
 {% block content %}
-    <h3>Testing from the index</h3>
 <!--
-    <p>{{ name }}</p>
- -->
+    <h3>Testing from the index</h3>
+-->
 
+
+<form name="SelectTheSorting">
+  <select name="links" id="links">
+    <option value="nothing" selected="selected">No sorting</option>
+    <option value="http://localhost:5000/suggestionlisting/DEFAULT">Default</option>
+    <option value="http://localhost:5000/suggestionlisting/COMMENTS_DESC">Most commented</option>
+    <option value="http://localhost:5000/suggestionlisting/COMMENTS_ASC">Least commented</option>
+    <option value="http://localhost:5000/suggestionlisting/CREATED_DESC">Newest first</option>
+    <option value="http://localhost:5000/suggestionlisting/CREATED_ASC">Oldest first</option>
+  </select>
+</form>
+
+<script type="text/javascript">
+  var urlMenu = document.getElementById('links');
+  console.log(urlMenu)
+  urlMenu.onchange = function() {
+    var userOption = this.options[this.selectedIndex];
+    if (userOption.value != "nothing") {
+        window.open(userOption.value);
+    }
+  }
+</script>
+
+<h5>Suggestions -
+  {% if sortingAtThePage %}
+    {{sortingAtThePage}}
+  {% endif %}
+</h5>
+{% for x in response %}
+  <h5><b>#
+    {% if 'fi' in x.preferred_labels %}
+      {{x.preferred_labels['fi']['value']}} /
+      {% endif %}
+      {% if 'sv' in x.preferred_labels %}
+        {{x.preferred_labels['sv']['value']}} /
+      {% endif %}
+      {% if 'en' in x.preferred_labels %}
+        {{x.preferred_labels['en']['value']}}
+      {% endif %}
+    </b></h5>
+    <!-- Next following will be implemented later on -->
+  <p><a href="http://localhost:5000/suggestion/{{x['id']}}">Go to suggestion</a>/
+    Id:</h6> {{x['id']}} /
+    Created:</h6> {{x['created']}} /
+    Modified:</h6> {{x['modified']}} 
+    <!--
+    Description:</h6> {{x['description']}}
+  -->
+    <!--
+    <p><h6>* Equivalences</h6><br>
+        {% for y in x.exactMatches: %}
+            Vocab: {{y.vocab}} / url: {{y.value}} <br>
+        {% endfor %}
+    </p>
+    -->
+    <!-- Comment actions will be implemented until the paging is ready
+    <p><h6>Comments:</h6><br>
+        {% for z in x.events: %}
+            {% if 'COMMENT' in z['event_type'] %}
+                - Created: {{z.created}} <br>
+                - Modified: {{z.modified}} <br>
+                - Text: <br><i>{{z.text}} / {{z.value}}</i> <br>
+                - From user: {{z.user_id}} <br>
+                <a href="http://localhost:5000/comment/{{x['id']}}/%22cba%22/2/%22cba%20cba%22">Add comment</a>
+                ...<br>
+            {% endif %}
+        {% endfor %}
+    </p>
+  -->
+
+{% endfor %}
 
 
 
