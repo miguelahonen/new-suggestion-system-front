@@ -19,7 +19,7 @@ flask run
 
 OR
 
-python3 frontTest1.py
+python3 main.py
 
 Yes!
 sudo gunicorn -w 4 --reload -b localhost:5000 "app.main:create_app(testing=False)"
