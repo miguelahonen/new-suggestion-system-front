@@ -13,11 +13,19 @@ def create_app(testing: bool = True):
     @app.route("/")
     def index():
         testing = True
-        return f'Testataan etusivun templatea <br> ja näkyykö boolit: {testing}'
+        return f'Will be a main page: {testing}'
+
+    @app.route("/testurl")
+    def common_tester_for_developers():
+        checkTokensAndRefresh(True)
+        headerForAPITesting = settings['commonHeader']; headerForAPITesting.update({"Authorization": session.get("aToken")}); responseForAPITesting = requests.put('http://localhost:8080/api/suggestions/1/status/RECEIVED', headers=headerForAPITesting)
+        print('Just for test purposes:\n' + responseForAPITesting.text)
+
+        testing = True
+        return f'Just for test purposes: {responseForAPITesting.text}'
 
     @app.route("/login/", methods=['GET', 'POST'])
     def login():
-        checkTokensAndRefresh(True)
         # utilities.checkTokensAndRefresh2()
         print(request.form.getlist("newUser"))
         if request.method == "POST":
