@@ -14,6 +14,41 @@ def create_app(testing: bool = True):
     def index():
         testing = True
         return f'Will be a main page: {testing}'
+        # return render_template("index.html", testing=testing)
+
+    @app.route("/suggestionlisting/<sorting>")
+    def suggestion_list(sorting):
+# f'{baseURL}users'
+        tempArray = []
+        if 'DEFAULT' in sorting:
+            # responseForAll = requests.get(f'{baseURL}suggestions?limit=25&search=bell')
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25')
+        elif 'CREATED_DESC' in sorting:
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=CREATED_DESC')
+        elif 'CREATED_ASC' in sorting:
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=CREATED_ASC')
+        elif 'COMMENTS_DESC' in sorting:
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=COMMENTS_DESC')
+        elif 'COMMENTS_ASC' in sorting:
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=COMMENTS_ASC')
+        else:
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25')
+
+        seedData=json.loads(responseForAll.text)
+        for suggestion in seedData['data']:
+            tempDict = {}
+            # tempDict['entire'] = suggestion
+            tempDict['id'] = suggestion['id']
+            tempDict['created'] = suggestion['created']
+            tempDict['modified'] = suggestion['modified']
+            tempDict['description'] = suggestion['description']
+            # tempDict['exactMatches'] = suggestion['exactMatches']
+            tempDict['events'] = suggestion['events']
+            tempDict['preferred_labels'] = suggestion['preferred_label']
+            tempArray.append(tempDict)
+        return render_template("index.html", response=tempArray,
+        sortingAtThePage=sorting)
+        # textBoxForComment="hei")
 
     @app.route("/testurl")
     def common_tester_for_developers():
@@ -108,9 +143,9 @@ def create_app(testing: bool = True):
         else:
             print("No tokens found")
 
-    @app.route("/nimi/<name>")
-    def test(name):
-        print(baseURL)
-        return render_template("index.html", name=name)
+    # @app.route("/nimi/<name>")
+    # def test(name):
+    #     print(baseURL)
+    #     return render_template("index.html", name=name)
 
     return app
