@@ -4,30 +4,142 @@
 <!--
     <h3>Testing from the index</h3>
 -->
-
-
+<div>
+  <p>&nbsp;</p>
+</div>
 <form name="SelectTheSorting">
-  <select name="links" id="links">
-    <option value="nothing" selected="selected">No sorting</option>
-    <option value="http://localhost:5000/suggestionlisting/DEFAULT">Default</option>
-    <option value="http://localhost:5000/suggestionlisting/COMMENTS_DESC">Most commented</option>
-    <option value="http://localhost:5000/suggestionlisting/COMMENTS_ASC">Least commented</option>
-    <option value="http://localhost:5000/suggestionlisting/CREATED_DESC">Newest first</option>
-    <option value="http://localhost:5000/suggestionlisting/CREATED_ASC">Oldest first</option>
-  </select>
+  <table>
+  <thead>
+    <tr>
+      <th colspan="4">Search options</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="4" style="border-style: solid; border-width:1px;">Tähän rakennetaan hakukenttä</td>
+    </tr>
+    <tr>
+      <td><b><font style="color:red;">Sort and Go</font</b></td>
+      <td>Status</td>
+      <td>Type</td>
+      <td>Labels</td>
+    </tr>
+    <tr>
+      <td>
+        <!-- original starts -->
+        <!-- // http://localhost:8080/suggestions/?filters=status:received|type:new|tags:slm musiikki&search=sovit&sort=CREATED_ASC
+        // http://localhost:8080/suggestions/?filters=status%3Areceived%7Ctype%3Anew%7Ctags%3Aslm%08musiikki&search=sovit&sort=CREATED_ASC
+        // : 	%3A
+        // |  %7C
+        // backspace %08 -->
+        <!-- status -->
+        <select name="links" id="links">
+          <option value="nothing" selected="selected">No sorting</option>
+          <option value="http://localhost:5000/suggestionlisting/DEFAULT">Default</option>
+          <option value="http://localhost:5000/suggestionlisting/COMMENTS_DESC">Most commented</option>
+          <option value="http://localhost:5000/suggestionlisting/COMMENTS_ASC">Least commented</option>
+          <option value="http://localhost:5000/suggestionlisting/CREATED_DESC">Newest first</option>
+          <option value="http://localhost:5000/suggestionlisting/CREATED_ASC">Oldest first</option>
+        </select>
+        <!-- original ends -->
+      </td>
+      <td>
+        <!-- status -->
+        <select name="shouldThisBeUsed" id="shouldThisBeUsed">
+          <option value="" selected="selected">Select</option>
+          <!-- <option value="">Select</option> -->
+          <option value="a:ABC|">ABC</option>
+          <option value="a:BCD|">BCD</option>
+          <option value="a:CDE|">CDE</option>
+          <option value="a:DEF|">DEF</option>
+          <option value="a:EFG|">EFG</option>
+          <option value="a:FGH|">FGH</option>
+        </select>
+      </td>
+      <td>
+        <!-- labels -->
+        <select name="selectThisNext" id="selectThisNext">
+          <option value="" selected="selected">Select</option>
+          <!-- <option value="">Select</option> -->
+          <option value="b:123">123</option>
+          <option value="b:234">234</option>
+          <option value="b:345">345</option>
+          <option value="b:456">456</option>
+          <option value="b:567">567</option>
+        </select>
+      </td>
+      <td>
+        <select name="selectThisAfter" id="selectThisAfter">
+          <option value="" selected="selected">Select</option>
+          <!-- <option value="">Select</option> -->
+          <option value="c:*">*</option>
+          <option value="c:**">**</option>
+          <option value="c:***">***</option>
+          <option value="c:****">****</option>
+          <option value="c:*****">*****</option>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+  </table>
 </form>
 
+
 <script type="text/javascript">
+// http://localhost:8080/suggestions/?filters=status:received|type:new|tags:slm musiikki&search=sovit&sort=CREATED_ASC
+// http://localhost:8080/suggestions/?filters=status%3Areceived%7Ctype%3Anew%7Ctags%3Aslm%08musiikki&search=sovit&sort=CREATED_ASC
+// : 	%3A
+// |  %7C
+// backspace %08
+
+  // Testing
+
+  // status
+  let baseLink = 'somethinInTheBottom';
+  var testing1 = document.getElementById('shouldThisBeUsed');
+  testing1.onchange = function() {
+    var fromThisBox = this.options[this.selectedIndex];
+    baseLink = baseLink.includes('a:') ? `${baseLink.replace(/a:.*|/, fromThisBox.value)}` : `${baseLink}${fromThisBox.value}`;
+    alert(baseLink);
+    // Seuraavaa ei saa poistaa:
+    // baseLink = `${baseLink}${fromThisBox.value}`;
+    alert(this.options.length);
+    // alert(this.options[this.selectedIndex].value[0,3]);
+    alert(this.options[this.selectedIndex].value);
+    alert(this.options[0].value);
+    alert(baseLink);
+  }
+  var testing2 = document.getElementById('selectThisNext');
+  testing2.onchange = function() {
+    var fromThisBox = this.options[this.selectedIndex];
+    baseLink = `${baseLink}${fromThisBox.value}`;
+    alert(baseLink);
+  }
+  var testing3 = document.getElementById('selectThisAfter');
+  testing3.onchange = function() {
+    var fromThisBox = this.options[this.selectedIndex];
+    baseLink = `${baseLink}${fromThisBox.value}`;
+    alert(baseLink);
+  }
+
+
+  // testing ends
+
   var urlMenu = document.getElementById('links');
   console.log(urlMenu)
   urlMenu.onchange = function() {
     var userOption = this.options[this.selectedIndex];
+    console.log("Käyttäjän valinta")
+    console.log(userOption.value);
     if (userOption.value != "nothing") {
         window.open(userOption.value);
     }
   }
 </script>
 
+<div>
+  <p>&nbsp;</p>
+</div>
 <h5>Suggestions -
   {% if sortingAtThePage %}
     {{sortingAtThePage}}
@@ -49,7 +161,7 @@
   <p><a href="http://localhost:5000/suggestion/{{x['id']}}">Go to suggestion</a>/
     Id:</h6> {{x['id']}} /
     Created:</h6> {{x['created']}} /
-    Modified:</h6> {{x['modified']}} 
+    Modified:</h6> {{x['modified']}}
     <!--
     Description:</h6> {{x['description']}}
   -->
