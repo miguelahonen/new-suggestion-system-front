@@ -32,7 +32,7 @@
         // : 	%3A
         // |  %7C
         // backspace %08 -->
-        <!-- status -->
+        <!-- sorting -->
         <select name="links" id="links">
           <option value="nothing" selected="selected">No sorting</option>
           <option value="http://localhost:5000/suggestionlisting/DEFAULT">Default</option>
@@ -45,31 +45,29 @@
       </td>
       <td>
         <!-- status -->
-        <select name="shouldThisBeUsed" id="shouldThisBeUsed">
+        <select name="statusSelector" id="statusSelector">
           <option value="" selected="selected">Select</option>
           <!-- <option value="">Select</option> -->
-          <option value="a:ABC|">ABC</option>
-          <option value="a:BCD|">BCD</option>
-          <option value="a:CDE|">CDE</option>
-          <option value="a:DEF|">DEF</option>
-          <option value="a:EFG|">EFG</option>
-          <option value="a:FGH|">FGH</option>
+          <option value="a:RECEIVED|">RECEIVED</option>
+          <option value="a:READ|">READ</option>
+          <option value="a:ACCEPTED|">ACCEPTED</option>
+          <option value="a:REJECTED|">REJECTED</option>
+          <option value="a:RETAINED|">RETAINED</option>
+          <option value="a:ARCHIVED|">ARCHIVED</option>
         </select>
       </td>
       <td>
-        <!-- labels -->
-        <select name="selectThisNext" id="selectThisNext">
+        <!-- type -->
+        <select name="typeSelector" id="typeSelector">
           <option value="" selected="selected">Select</option>
           <!-- <option value="">Select</option> -->
-          <option value="b:123">123</option>
-          <option value="b:234">234</option>
-          <option value="b:345">345</option>
-          <option value="b:456">456</option>
-          <option value="b:567">567</option>
+          <option value="b:NEW|">NEW</option>
+          <option value="b:MODIFY|">MODIFY</option>
         </select>
       </td>
       <td>
-        <select name="selectThisAfter" id="selectThisAfter">
+        <!-- tags -->
+        <select name="tagsSelector" id="tagsSelector">
           <option value="" selected="selected">Select</option>
           <!-- <option value="">Select</option> -->
           <option value="c:*">*</option>
@@ -96,27 +94,29 @@
 
   // status
   let baseLink = 'somethinInTheBottom';
-  var testing1 = document.getElementById('shouldThisBeUsed');
-  testing1.onchange = function() {
+  var fromStatusSelector = document.getElementById('statusSelector');
+  fromStatusSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
-    baseLink = baseLink.includes('a:') ? `${baseLink.replace(/a:.*|/, fromThisBox.value)}` : `${baseLink}${fromThisBox.value}`;
+    baseLink = baseLink.includes('a:') ? `${baseLink.replace(/a:.*\|/, fromThisBox.value)}` : `${baseLink}${fromThisBox.value}`;
     alert(baseLink);
     // Seuraavaa ei saa poistaa:
     // baseLink = `${baseLink}${fromThisBox.value}`;
     alert(this.options.length);
     // alert(this.options[this.selectedIndex].value[0,3]);
     alert(this.options[this.selectedIndex].value);
-    alert(this.options[0].value);
+    // alert(this.options[0].value);
     alert(baseLink);
   }
-  var testing2 = document.getElementById('selectThisNext');
-  testing2.onchange = function() {
+  // types
+  var fromTypeSelector = document.getElementById('typeSelector');
+  fromTypeSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
-    baseLink = `${baseLink}${fromThisBox.value}`;
+    baseLink = baseLink.includes('b:') ? `${baseLink.replace(/b:.*\|/, fromThisBox.value)}` : `${baseLink}${fromThisBox.value}`;
     alert(baseLink);
   }
-  var testing3 = document.getElementById('selectThisAfter');
-  testing3.onchange = function() {
+  // tags
+  var fromTagsSelector = document.getElementById('tagsSelector');
+  fromTagsSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
     baseLink = `${baseLink}${fromThisBox.value}`;
     alert(baseLink);
