@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Suggestions{% endblock %}
 {% block content %}
-<!--
-    <h3>Testing from the index</h3>
--->
+
 <div>
   <p>&nbsp;</p>
 </div>
@@ -41,12 +39,11 @@
           <option value="http://localhost:5000/suggestionlisting/CREATED_DESC">Newest first</option>
           <option value="http://localhost:5000/suggestionlisting/CREATED_ASC">Oldest first</option>
         </select>
-        <!-- original ends -->
       </td>
       <td>
         <!-- status -->
         <select name="statusSelector" id="statusSelector">
-          <option value="" selected="selected">Select</option>
+          <option value="a{space" selected="selected">Select/clear</option>
           <!-- <option value="">Select</option> -->
           <option value="a:RECEIVED|">RECEIVED</option>
           <option value="a:READ|">READ</option>
@@ -59,7 +56,7 @@
       <td>
         <!-- type -->
         <select name="typeSelector" id="typeSelector">
-          <option value="" selected="selected">Select</option>
+          <option value="b{space" selected="selected">Select/clear</option>
           <!-- <option value="">Select</option> -->
           <option value="b:NEW|">NEW</option>
           <option value="b:MODIFY|">MODIFY</option>
@@ -82,39 +79,43 @@
   </table>
 </form>
 
-
 <script type="text/javascript">
-// http://localhost:8080/suggestions/?filters=status:received|type:new|tags:slm musiikki&search=sovit&sort=CREATED_ASC
-// http://localhost:8080/suggestions/?filters=status%3Areceived%7Ctype%3Anew%7Ctags%3Aslm%08musiikki&search=sovit&sort=CREATED_ASC
-// : 	%3A
-// |  %7C
-// backspace %08
-
-  // Testing
-
   // status
-  let baseLink = 'somethinInTheBottom';
+  let baseLink = 'http://localhost:8080/';
+  let linkSectionForStatus = '', linkSectionForTypes = '', linkSectionForTags = '';
+  var linkForSearchAndFiltering = {
+    "statusPart": "",
+    "typePart": "",
+    "TagsPart": ""
+  }
   var fromStatusSelector = document.getElementById('statusSelector');
   fromStatusSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
-    baseLink = baseLink.includes('a:') ? `${baseLink.replace(/a:.*\|/, fromThisBox.value)}` : `${baseLink}${fromThisBox.value}`;
-    alert(baseLink);
-    // Seuraavaa ei saa poistaa:
-    // baseLink = `${baseLink}${fromThisBox.value}`;
-    alert(this.options.length);
-    // alert(this.options[this.selectedIndex].value[0,3]);
-    alert(this.options[this.selectedIndex].value);
-    // alert(this.options[0].value);
-    alert(baseLink);
+    if (fromThisBox.value.includes('a{space')) {
+      linkSectionForStatus = linkSectionForStatus.replace(/a:.*\|/, ``); // tässä on joku ongelma, ei korvaa haettua subia uudella
+    } else if (linkSectionForStatus.includes('a:')) {
+      linkSectionForStatus = linkSectionForStatus.replace(/a:.*\|/, fromThisBox.value);
+    } else {
+      linkSectionForStatus = `${linkSectionForStatus}${fromThisBox.value}`;
+    }
+    linkForSearchAndFiltering['statusPart'] = linkSectionForStatus;
+    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
   }
   // types
   var fromTypeSelector = document.getElementById('typeSelector');
   fromTypeSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
-    baseLink = baseLink.includes('b:') ? `${baseLink.replace(/b:.*\|/, fromThisBox.value)}` : `${baseLink}${fromThisBox.value}`;
-    alert(baseLink);
+    if (fromThisBox.value.includes('b{space')) {
+      linkSectionForTypes = linkSectionForTypes.replace(/b:.*\|/, ``); // tässä on joku ongelma, ei korvaa haettua subia uudella
+    } else if (linkSectionForTypes.includes('b:')) {
+      linkSectionForTypes = linkSectionForTypes.replace(/b:.*\|/, fromThisBox.value);
+    } else {
+      linkSectionForTypes = `${linkSectionForTypes}${fromThisBox.value}`;
+    }
+    linkForSearchAndFiltering['typePart'] = linkSectionForTypes;
+    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
   }
-  // tags
+  // tags / The next focus is here. Make the changes like above
   var fromTagsSelector = document.getElementById('tagsSelector');
   fromTagsSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
@@ -122,9 +123,7 @@
     alert(baseLink);
   }
 
-
-  // testing ends
-
+  // This function will read the linkForSearchAndFiltering and redirects the user to the listing page
   var urlMenu = document.getElementById('links');
   console.log(urlMenu)
   urlMenu.onchange = function() {
