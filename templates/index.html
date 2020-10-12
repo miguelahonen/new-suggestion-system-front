@@ -64,14 +64,20 @@
       </td>
       <td>
         <!-- tags -->
-        <select name="tagsSelector" id="tagsSelector">
-          <option value="" selected="selected">Select</option>
-          <!-- <option value="">Select</option> -->
-          <option value="c:*">*</option>
-          <option value="c:**">**</option>
-          <option value="c:***">***</option>
-          <option value="c:****">****</option>
-          <option value="c:*****">*****</option>
+          <!-- as a delimiter with the tags is used: %08 -->
+        <select class="tagsSelector" name="tagsSelector[]" multiple="multiple">
+          <!-- <option value="" selected="selected">Select</option> -->
+          <!-- <option value="" selected hidden>Make your choice</option> -->
+          <option value="c:OPT1">OPT1</option>
+          <option value="c:OPT2">OPT2</option>
+          <option value="c:OPT3">OPT3</option>
+          <option value="c:OPT4">OPT4</option>
+          <option value="c:OPT5">OPT5</option>
+          <option value="c:OPT6">OPT6</option>
+          <option value="c:OPT7">OPT7</option>
+          <option value="c:OPT8">OPT8</option>
+          <option value="c:OPT9">OPT9</option>
+          <option value="c:OPT10">OPT10</option>
         </select>
       </td>
     </tr>
@@ -80,13 +86,26 @@
 </form>
 
 <script type="text/javascript">
+
+// window.onload = function() {
+//     if (window.jQuery) {
+//         // Check if jQuery is woking
+//         alert("Yes, it does");
+//     } else {
+//         // If it does notlinkForSearchAndFiltering['typePart'] = linkSectionForTypes;
+//         alert("No...");
+//     }
+// }
+
+
+
   // status
   let baseLink = 'http://localhost:8080/';
   let linkSectionForStatus = '', linkSectionForTypes = '', linkSectionForTags = '';
   var linkForSearchAndFiltering = {
     "statusPart": "",
     "typePart": "",
-    "TagsPart": ""
+    "TagsPart": []
   }
   var fromStatusSelector = document.getElementById('statusSelector');
   fromStatusSelector.onchange = function() {
@@ -115,13 +134,15 @@
     linkForSearchAndFiltering['typePart'] = linkSectionForTypes;
     console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
   }
-  // tags / The next focus is here. Make the changes like above
-  var fromTagsSelector = document.getElementById('tagsSelector');
-  fromTagsSelector.onchange = function() {
-    var fromThisBox = this.options[this.selectedIndex];
-    baseLink = `${baseLink}${fromThisBox.value}`;
-    alert(baseLink);
-  }
+
+  $(document).ready(function() {
+    var testix = $('.tagsSelector').select2();
+    // var testix = $('.tagsSelector').find(':selected').data();
+    testix.onchange(function() {
+      alert($('.tagsSelector').find(':selected').data());
+    });
+    // alert($('.tagsSelector').find(':selected').data());
+  });
 
   // This function will read the linkForSearchAndFiltering and redirects the user to the listing page
   var urlMenu = document.getElementById('links');
@@ -187,8 +208,5 @@
   -->
 
 {% endfor %}
-
-
-
 
 {% endblock %}
