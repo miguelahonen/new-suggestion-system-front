@@ -62,18 +62,9 @@
       </td>
       <td>
         <!-- tags -->
+
         <select class="tagsSelector" name="tagsSelector[]" id="tagsSelector" multiple="multiple">
           <option disabled selected value="">Select the labels</option>
-          <option value="OPT1">OPT1</option>
-          <option value="OPT2">OPT2</option>
-          <option value="OPT3">OPT3</option>
-          <option value="OPT4">OPT4</option>
-          <option value="OPT5">OPT5</option>
-          <option value="OPT6">OPT6</option>
-          <option value="OPT7">OPT7</option>
-          <option value="OPT8">OPT8</option>
-          <option value="OPT9">OPT9</option>
-          <option value="OPT10">OPT10</option>
         </select>
       </td>
     </tr>
@@ -83,8 +74,18 @@
 
 <!-- <p id="heyItWorks">Does it work?*</p> -->
 
-
 <script type="text/javascript">
+
+// Next block is used to generate options for tagsSelector multiple dropdown box
+var select = document.getElementById('tagsSelector');
+let labelData = JSON.parse('{{ labelList | tojson }}');
+
+for (var i = 0; i <= labelData.length; i++){
+    var opt = document.createElement('option');
+    opt.value = labelData[i];
+    opt.innerHTML = labelData[i];
+    select.appendChild(opt);
+}
 
 // Check if Ajax is working*
 // $('#heyItWorks').click(function(){
@@ -105,16 +106,17 @@
 //     }
 // }
 
-
-
   // status
-  let baseLink = 'http://localhost:8080/';
+  let placeHolderArg = 'x:|';
+  var filterCollection = ''
   let linkSectionForStatus = '', linkSectionForTypes = '', linkSectionForTags = '';
   var linkForSearchAndFiltering = {
     "statusPart": "",
     "typePart": "",
     "tagsPart": []
   }
+  var urlArguments = ''
+  var tagsCollection = "";
   var fromStatusSelector = document.getElementById('statusSelector');
   fromStatusSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
@@ -126,7 +128,8 @@
       linkSectionForStatus = `${linkSectionForStatus}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['statusPart'] = linkSectionForStatus;
-    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.tagsPart}`);
+    urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
+    console.log(urlArguments);
   }
   // types
   var fromTypeSelector = document.getElementById('typeSelector');
@@ -140,20 +143,22 @@
       linkSectionForTypes = `${linkSectionForTypes}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['typePart'] = linkSectionForTypes;
-    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.tagsPart}`);
+    urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
+    console.log(urlArguments);
   }
 
   $(document).ready(function() {
     $('.tagsSelector').select2();
     $('.tagsSelector').change('select2:select', function (helperArgument) {
+      tagsCollection = "";
       var selectedValues = $(helperArgument.currentTarget).val();
       linkForSearchAndFiltering['tagsPart'] = selectedValues;
       if (selectedValues.length > 0) {
-        var tagsCollection = "";
         selectedValues.forEach(function(oneTagLabel){
-          tagsCollection += oneTagLabel.concat('%08');
+          tagsCollection += '*'.concat(oneTagLabel);// .concat('*');
         });
-        console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}tags:${tagsCollection}`);
+        urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
+        console.log(urlArguments);
       }
     });
   });
@@ -164,9 +169,9 @@
   urlMenu.onchange = function() {
     var userOption = this.options[this.selectedIndex];
     console.log("Käyttäjän valinta")
-    console.log(userOption.value);
+    console.log(userOption.value.concat(`/${urlArguments}`));
     if (userOption.value != "nothing") {
-        window.open(userOption.value);
+        window.open(userOption.value.concat(`/${urlArguments}`));
     }
   }
 </script>
@@ -191,7 +196,7 @@
         {{x.preferred_labels['en']['value']}}
       {% endif %}
     </b></h5>
-    <!-- Next following will be implemented later on -->
+    <!-- Next following will be implemented later on -selectElementId-->
   <p><a href="http://localhost:5000/suggestion/{{x['id']}}">Go to suggestion</a>/
     Id:</h6> {{x['id']}} /
     Created:</h6> {{x['created']}} /
@@ -219,7 +224,9 @@
             {% endif %}
         {% endfor %}
     </p>
-  -->
+
+ -->
+
 
 {% endfor %}
 
