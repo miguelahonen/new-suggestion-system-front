@@ -44,7 +44,6 @@
         <!-- status -->
         <select name="statusSelector" id="statusSelector">
           <option value="a{space" selected="selected">Select/clear</option>
-          <!-- <option value="">Select</option> -->
           <option value="a:RECEIVED|">RECEIVED</option>
           <option value="a:READ|">READ</option>
           <option value="a:ACCEPTED|">ACCEPTED</option>
@@ -57,27 +56,24 @@
         <!-- type -->
         <select name="typeSelector" id="typeSelector">
           <option value="b{space" selected="selected">Select/clear</option>
-          <!-- <option value="">Select</option> -->
           <option value="b:NEW|">NEW</option>
           <option value="b:MODIFY|">MODIFY</option>
         </select>
       </td>
       <td>
         <!-- tags -->
-          <!-- as a delimiter with the tags is used: %08 -->
-        <select class="tagsSelector" name="tagsSelector[]" multiple="multiple">
-          <!-- <option value="" selected="selected">Select</option> -->
-          <!-- <option value="" selected hidden>Make your choice</option> -->
-          <option value="c:OPT1">OPT1</option>
-          <option value="c:OPT2">OPT2</option>
-          <option value="c:OPT3">OPT3</option>
-          <option value="c:OPT4">OPT4</option>
-          <option value="c:OPT5">OPT5</option>
-          <option value="c:OPT6">OPT6</option>
-          <option value="c:OPT7">OPT7</option>
-          <option value="c:OPT8">OPT8</option>
-          <option value="c:OPT9">OPT9</option>
-          <option value="c:OPT10">OPT10</option>
+        <select class="tagsSelector" name="tagsSelector[]" id="tagsSelector" multiple="multiple">
+          <option disabled selected value="">Select the labels</option>
+          <option value="OPT1">OPT1</option>
+          <option value="OPT2">OPT2</option>
+          <option value="OPT3">OPT3</option>
+          <option value="OPT4">OPT4</option>
+          <option value="OPT5">OPT5</option>
+          <option value="OPT6">OPT6</option>
+          <option value="OPT7">OPT7</option>
+          <option value="OPT8">OPT8</option>
+          <option value="OPT9">OPT9</option>
+          <option value="OPT10">OPT10</option>
         </select>
       </td>
     </tr>
@@ -85,15 +81,27 @@
   </table>
 </form>
 
+<!-- <p id="heyItWorks">Does it work?*</p> -->
+
+
 <script type="text/javascript">
 
+// Check if Ajax is working*
+// $('#heyItWorks').click(function(){
+//   alert("Go to Google");
+// });
+
+// Check if Vanilla is working*
+// document.getElementById('heyItWorks').onclick = function() {
+//   alert("Hey, it works!");
+// }
+
+// Check if Jquery is working
 // window.onload = function() {
 //     if (window.jQuery) {
-//         // Check if jQuery is woking
-//         alert("Yes, it does");
+//         alert("Hey, it works!");
 //     } else {
-//         // If it does notlinkForSearchAndFiltering['typePart'] = linkSectionForTypes;
-//         alert("No...");
+//         alert("Ouhttps://helsinki.zoom.us/j/2906260184?pwd=SXJVYnZGRWd6Yit0TW5LZE95OXRiQT09 nou");
 //     }
 // }
 
@@ -105,7 +113,7 @@
   var linkForSearchAndFiltering = {
     "statusPart": "",
     "typePart": "",
-    "TagsPart": []
+    "tagsPart": []
   }
   var fromStatusSelector = document.getElementById('statusSelector');
   fromStatusSelector.onchange = function() {
@@ -118,7 +126,7 @@
       linkSectionForStatus = `${linkSectionForStatus}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['statusPart'] = linkSectionForStatus;
-    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
+    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.tagsPart}`);
   }
   // types
   var fromTypeSelector = document.getElementById('typeSelector');
@@ -132,16 +140,22 @@
       linkSectionForTypes = `${linkSectionForTypes}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['typePart'] = linkSectionForTypes;
-    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
+    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.tagsPart}`);
   }
 
   $(document).ready(function() {
-    var testix = $('.tagsSelector').select2();
-    // var testix = $('.tagsSelector').find(':selected').data();
-    testix.onchange(function() {
-      alert($('.tagsSelector').find(':selected').data());
+    $('.tagsSelector').select2();
+    $('.tagsSelector').change('select2:select', function (helperArgument) {
+      var selectedValues = $(helperArgument.currentTarget).val();
+      linkForSearchAndFiltering['tagsPart'] = selectedValues;
+      if (selectedValues.length > 0) {
+        var tagsCollection = "";
+        selectedValues.forEach(function(oneTagLabel){
+          tagsCollection += oneTagLabel.concat('%08');
+        });
+        console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}tags:${tagsCollection}`);
+      }
     });
-    // alert($('.tagsSelector').find(':selected').data());
   });
 
   // This function will read the linkForSearchAndFiltering and redirects the user to the listing page
