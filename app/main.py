@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, render_template, request, session
+from itertools import chain
 import requests
 import json
 import os
@@ -16,8 +17,9 @@ def create_app(testing: bool = True):
         return f'Will be a main page: {testing}'
         # return render_template("index.html", testing=testing)
 
-    @app.route("/suggestionlisting/<sorting>")
-    def suggestion_list(sorting):
+    @app.route("/suggestionlisting/<sorting>/<filters>")
+    def suggestion_list(sorting, filters):
+        print(filters)
 # f'{baseURL}users'
         tempArray = []
         if 'DEFAULT' in sorting:
@@ -46,9 +48,13 @@ def create_app(testing: bool = True):
             tempDict['events'] = suggestion['events']
             tempDict['preferred_labels'] = suggestion['preferred_label']
             tempArray.append(tempDict)
-        return render_template("index.html", response=tempArray,
-        sortingAtThePage=sorting)
-        # textBoxForComment="hei")
+
+        labelListFromBE = json.loads(requests.get(f'{baseURL}tags').text)['data']
+        labelListForTheModel = []
+        for labelDict in labelListFromBE:
+            labelListForTheModel.append(labelDict['label'])
+
+        return render_template("index.html", response=tempArray, sortingAtThePage=sorting, labelList=labelListForTheModel)
 
     @app.route("/testurl")
     def common_tester_for_developers():

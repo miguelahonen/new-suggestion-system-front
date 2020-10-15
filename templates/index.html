@@ -44,7 +44,6 @@
         <!-- status -->
         <select name="statusSelector" id="statusSelector">
           <option value="a{space" selected="selected">Select/clear</option>
-          <!-- <option value="">Select</option> -->
           <option value="a:RECEIVED|">RECEIVED</option>
           <option value="a:READ|">READ</option>
           <option value="a:ACCEPTED|">ACCEPTED</option>
@@ -57,21 +56,15 @@
         <!-- type -->
         <select name="typeSelector" id="typeSelector">
           <option value="b{space" selected="selected">Select/clear</option>
-          <!-- <option value="">Select</option> -->
           <option value="b:NEW|">NEW</option>
           <option value="b:MODIFY|">MODIFY</option>
         </select>
       </td>
       <td>
         <!-- tags -->
-        <select name="tagsSelector" id="tagsSelector">
-          <option value="" selected="selected">Select</option>
-          <!-- <option value="">Select</option> -->
-          <option value="c:*">*</option>
-          <option value="c:**">**</option>
-          <option value="c:***">***</option>
-          <option value="c:****">****</option>
-          <option value="c:*****">*****</option>
+
+        <select class="tagsSelector" name="tagsSelector[]" id="tagsSelector" multiple="multiple">
+          <option disabled selected value="">Select the labels</option>
         </select>
       </td>
     </tr>
@@ -79,15 +72,51 @@
   </table>
 </form>
 
+<!-- <p id="heyItWorks">Does it work?*</p> -->
+
 <script type="text/javascript">
+
+// Next block is used to generate options for tagsSelector multiple dropdown box
+var select = document.getElementById('tagsSelector');
+let labelData = JSON.parse('{{ labelList | tojson }}');
+
+for (var i = 0; i <= labelData.length; i++){
+    var opt = document.createElement('option');
+    opt.value = labelData[i];
+    opt.innerHTML = labelData[i];
+    select.appendChild(opt);
+}
+
+// Check if Ajax is working*
+// $('#heyItWorks').click(function(){
+//   alert("Go to Google");
+// });
+
+// Check if Vanilla is working*
+// document.getElementById('heyItWorks').onclick = function() {
+//   alert("Hey, it works!");
+// }
+
+// Check if Jquery is working
+// window.onload = function() {
+//     if (window.jQuery) {
+//         alert("Hey, it works!");
+//     } else {
+//         alert("Ouhttps://helsinki.zoom.us/j/2906260184?pwd=SXJVYnZGRWd6Yit0TW5LZE95OXRiQT09 nou");
+//     }
+// }
+
   // status
-  let baseLink = 'http://localhost:8080/';
+  let placeHolderArg = 'x:|';
+  var filterCollection = ''
   let linkSectionForStatus = '', linkSectionForTypes = '', linkSectionForTags = '';
   var linkForSearchAndFiltering = {
     "statusPart": "",
     "typePart": "",
-    "TagsPart": ""
+    "tagsPart": []
   }
+  var urlArguments = ''
+  var tagsCollection = "";
   var fromStatusSelector = document.getElementById('statusSelector');
   fromStatusSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
@@ -99,7 +128,8 @@
       linkSectionForStatus = `${linkSectionForStatus}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['statusPart'] = linkSectionForStatus;
-    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
+    urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
+    console.log(urlArguments);
   }
   // types
   var fromTypeSelector = document.getElementById('typeSelector');
@@ -113,15 +143,25 @@
       linkSectionForTypes = `${linkSectionForTypes}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['typePart'] = linkSectionForTypes;
-    console.log(`${baseLink}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${linkForSearchAndFiltering.TagsPart}`);
+    urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
+    console.log(urlArguments);
   }
-  // tags / The next focus is here. Make the changes like above
-  var fromTagsSelector = document.getElementById('tagsSelector');
-  fromTagsSelector.onchange = function() {
-    var fromThisBox = this.options[this.selectedIndex];
-    baseLink = `${baseLink}${fromThisBox.value}`;
-    alert(baseLink);
-  }
+
+  $(document).ready(function() {
+    $('.tagsSelector').select2();
+    $('.tagsSelector').change('select2:select', function (helperArgument) {
+      tagsCollection = "";
+      var selectedValues = $(helperArgument.currentTarget).val();
+      linkForSearchAndFiltering['tagsPart'] = selectedValues;
+      if (selectedValues.length > 0) {
+        selectedValues.forEach(function(oneTagLabel){
+          tagsCollection += '*'.concat(oneTagLabel);// .concat('*');
+        });
+        urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
+        console.log(urlArguments);
+      }
+    });
+  });
 
   // This function will read the linkForSearchAndFiltering and redirects the user to the listing page
   var urlMenu = document.getElementById('links');
@@ -129,9 +169,9 @@
   urlMenu.onchange = function() {
     var userOption = this.options[this.selectedIndex];
     console.log("Käyttäjän valinta")
-    console.log(userOption.value);
+    console.log(userOption.value.concat(`/${urlArguments}`));
     if (userOption.value != "nothing") {
-        window.open(userOption.value);
+        window.open(userOption.value.concat(`/${urlArguments}`));
     }
   }
 </script>
@@ -156,7 +196,7 @@
         {{x.preferred_labels['en']['value']}}
       {% endif %}
     </b></h5>
-    <!-- Next following will be implemented later on -->
+    <!-- Next following will be implemented later on -selectElementId-->
   <p><a href="http://localhost:5000/suggestion/{{x['id']}}">Go to suggestion</a>/
     Id:</h6> {{x['id']}} /
     Created:</h6> {{x['created']}} /
@@ -184,11 +224,10 @@
             {% endif %}
         {% endfor %}
     </p>
-  -->
+
+ -->
+
 
 {% endfor %}
-
-
-
 
 {% endblock %}
