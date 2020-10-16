@@ -14,7 +14,14 @@
   </thead>
   <tbody>
     <tr>
-      <td colspan="4" style="border-style: solid; border-width:1px;">Tähän rakennetaan hakukenttä</td>
+      <td colspan="4" style="border-style: solid; border-width:1px;">
+        <label for="searchTerms">Type your search criteria</label><br>
+        <input type="text" id="searchTerms" name="searchTerms" style="border-width: 2px; width: 100%; "><br>
+        <!--
+        Tips for the future
+        -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+        -->
+      </td>
     </tr>
     <tr>
       <td><b><font style="color:red;">Sort and Go</font</b></td>
@@ -56,8 +63,8 @@
         <!-- type -->
         <select name="typeSelector" id="typeSelector">
           <option value="b{space" selected="selected">Select/clear</option>
-          <option value="b:NEW|">NEW</option>
-          <option value="b:MODIFY|">MODIFY</option>
+          <option value="b:NEW¤">NEW</option>
+          <option value="b:MODIFY¤">MODIFY</option>
         </select>
       </td>
       <td>
@@ -72,9 +79,32 @@
   </table>
 </form>
 
+<!-- For Vanilla, Ajax and jQuery testing -->
 <!-- <p id="heyItWorks">Does it work?*</p> -->
+<!-- ends -->
 
 <script type="text/javascript">
+
+// For Vanilla, Ajax and jQuery testing
+// Check if Vanilla is working*
+// document.getElementById('heyItWorks').onclick = function() {
+//   alert("Hey, it works!");
+// }
+
+// Check if Ajax is working*
+// $('#heyItWorks').click(function(){
+//   alert("Go to Google");
+// });
+
+// Check if Jquery is working
+// window.onload = function() {
+//     if (window.jQuery) {
+//         alert("Hey, it works!");
+//     } else {
+//         alert("Ouhttps://helsinki.zoom.us/j/2906260184?pwd=SXJVYnZGRWd6Yit0TW5LZE95OXRiQT09 nou");
+//     }
+// }
+// Ends
 
 // Next block is used to generate options for tagsSelector multiple dropdown box
 var select = document.getElementById('tagsSelector');
@@ -87,24 +117,6 @@ for (var i = 0; i <= labelData.length; i++){
     select.appendChild(opt);
 }
 
-// Check if Ajax is working*
-// $('#heyItWorks').click(function(){
-//   alert("Go to Google");
-// });
-
-// Check if Vanilla is working*
-// document.getElementById('heyItWorks').onclick = function() {
-//   alert("Hey, it works!");
-// }
-
-// Check if Jquery is working
-// window.onload = function() {
-//     if (window.jQuery) {
-//         alert("Hey, it works!");
-//     } else {
-//         alert("Ouhttps://helsinki.zoom.us/j/2906260184?pwd=SXJVYnZGRWd6Yit0TW5LZE95OXRiQT09 nou");
-//     }
-// }
 
   // status
   let placeHolderArg = 'x:|';
@@ -121,7 +133,7 @@ for (var i = 0; i <= labelData.length; i++){
   fromStatusSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
     if (fromThisBox.value.includes('a{space')) {
-      linkSectionForStatus = linkSectionForStatus.replace(/a:.*\|/, ``); // tässä on joku ongelma, ei korvaa haettua subia uudella
+      linkSectionForStatus = linkSectionForStatus.replace(/a:.*\|/, ``);
     } else if (linkSectionForStatus.includes('a:')) {
       linkSectionForStatus = linkSectionForStatus.replace(/a:.*\|/, fromThisBox.value);
     } else {
@@ -129,23 +141,22 @@ for (var i = 0; i <= labelData.length; i++){
     }
     linkForSearchAndFiltering['statusPart'] = linkSectionForStatus;
     urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
-    console.log(urlArguments);
   }
   // types
   var fromTypeSelector = document.getElementById('typeSelector');
   fromTypeSelector.onchange = function() {
     var fromThisBox = this.options[this.selectedIndex];
     if (fromThisBox.value.includes('b{space')) {
-      linkSectionForTypes = linkSectionForTypes.replace(/b:.*\|/, ``); // tässä on joku ongelma, ei korvaa haettua subia uudella
+      linkSectionForTypes = linkSectionForTypes.replace(/b:.*¤/, ``);
     } else if (linkSectionForTypes.includes('b:')) {
-      linkSectionForTypes = linkSectionForTypes.replace(/b:.*\|/, fromThisBox.value);
+      linkSectionForTypes = linkSectionForTypes.replace(/b:.*¤/, fromThisBox.value);
     } else {
       linkSectionForTypes = `${linkSectionForTypes}${fromThisBox.value}`;
     }
     linkForSearchAndFiltering['typePart'] = linkSectionForTypes;
     urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
-    console.log(urlArguments);
   }
+
 
   $(document).ready(function() {
     $('.tagsSelector').select2();
@@ -155,23 +166,29 @@ for (var i = 0; i <= labelData.length; i++){
       linkForSearchAndFiltering['tagsPart'] = selectedValues;
       if (selectedValues.length > 0) {
         selectedValues.forEach(function(oneTagLabel){
-          tagsCollection += '*'.concat(oneTagLabel);// .concat('*');
+          tagsCollection += '*'.concat(oneTagLabel);
         });
         urlArguments = `${placeHolderArg}${linkForSearchAndFiltering.statusPart}${linkForSearchAndFiltering.typePart}${tagsCollection}`;
-        console.log(urlArguments);
       }
     });
   });
 
   // This function will read the linkForSearchAndFiltering and redirects the user to the listing page
+  // Note: Change the loading according to onChange principles
   var urlMenu = document.getElementById('links');
-  console.log(urlMenu)
   urlMenu.onchange = function() {
+    // Search textbox
+    var searchText = document.getElementById('searchTerms').value;
+    if (searchText.length == 0) {
+      searchText = "noSearchStringSubmitted";
+    }
     var userOption = this.options[this.selectedIndex];
-    console.log("Käyttäjän valinta")
-    console.log(userOption.value.concat(`/${urlArguments}`));
     if (userOption.value != "nothing") {
-        window.open(userOption.value.concat(`/${urlArguments}`));
+      if(urlArguments.length == 0) {
+        window.open(userOption.value.concat(`/noArguments/${searchText}`));
+      } else {
+        window.open(userOption.value.concat(`/${urlArguments}/${searchText}`));
+      }
     }
   }
 </script>

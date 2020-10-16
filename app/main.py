@@ -3,6 +3,7 @@ from itertools import chain
 import requests
 import json
 import os
+# import re
 
 
 def create_app(testing: bool = True):
@@ -17,22 +18,45 @@ def create_app(testing: bool = True):
         return f'Will be a main page: {testing}'
         # return render_template("index.html", testing=testing)
 
-    @app.route("/suggestionlisting/<sorting>/<filters>")
-    def suggestion_list(sorting, filters):
-        print(filters)
-# f'{baseURL}users'
+    @app.route("/suggestionlisting/<sorting>/<filters>/<searchString>")
+    def suggestion_list(sorting, filters, searchString):
+        # Use the next following url information to compose a comprehensive comment section
+        # http://localhost:5000/suggestionlisting/DEFAULT/tluafed/tluafed
+        # http://localhost:8080/suggestions/?filters=status:received|type:new|tags:slm musiikki&search=sovit&sort=CREATED_ASC
+        # http://localhost:8080/suggestions/?filters=status%3Areceived%7Ctype%3Anew%7Ctags%3Aslm%08musiikki&search=sovit&sort=CREATED_ASC
+        # noArguments
+        # noSearchStringSubmitted
+        isSearch = False
+        if 'tluafed' not in searchString and 'noSearchStringSubmitted' not in searchString:
+            isSearch = True
+            searchString = f'&search={searchString}'
+        else:
+            searchString = ''
+            filtersForUrl = ''
+        isFilter = False
+        if 'tluafed' not in filters and 'noArguments' not in filters:
+            isFilter = True
+            filtersForUrl = '&filters='
+            if 'a:' in filters:
+                filtersForUrl = filtersForUrl + 'status%3A' + filters[filters.find('a:')+len('a:'):filters.rfind('|')].lower()
+            if 'b:' in filters:
+                filtersForUrl = filtersForUrl + '%7Ctype%3A' + filters[filters.find('b:')+len('b:'):filters.rfind('¤')].lower()
+            if '*' in filters:
+                filtersForUrl = filtersForUrl + '%7Ctags%3A' + filters.partition('*')[2].replace('*','%08').lower()
+        else:
+            print("oli tluafed tai noArguments filtersissä")
+
         tempArray = []
         if 'DEFAULT' in sorting:
-            # responseForAll = requests.get(f'{baseURL}suggestions?limit=25&search=bell')
             responseForAll = requests.get(f'{baseURL}suggestions?limit=25')
         elif 'CREATED_DESC' in sorting:
-            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=CREATED_DESC')
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25{filtersForUrl}{searchString}&sort=CREATED_DESC')
         elif 'CREATED_ASC' in sorting:
-            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=CREATED_ASC')
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25{filtersForUrl}{searchString}&sort=CREATED_ASC')
         elif 'COMMENTS_DESC' in sorting:
-            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=COMMENTS_DESC')
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25{filtersForUrl}{searchString}&sort=COMMENTS_DESC')
         elif 'COMMENTS_ASC' in sorting:
-            responseForAll = requests.get(f'{baseURL}suggestions?limit=25&sort=COMMENTS_ASC')
+            responseForAll = requests.get(f'{baseURL}suggestions?limit=25{filtersForUrl}{searchString}&sort=COMMENTS_ASC')
         else:
             responseForAll = requests.get(f'{baseURL}suggestions?limit=25')
 
