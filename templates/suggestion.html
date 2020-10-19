@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Suggestion{% endblock %}
+{% block content %}
+    <button onClick="window.location.href=window.location.href">Lataa sivu uudelleen</button>
+    #{{suggestionId}}
+    <h3>
+      {% for prfLab in prefLabels: %}
+        {% if prfLab.finnish %}
+          {{prfLab.finnish}}
+        {% endif %}
+        {% if prfLab.swedish %}
+          / {{prfLab.swedish}}
+        {% endif %}
+        {% if prfLab.english %}
+          / {{prfLab.english}}
+        {% endif %}
+      {% endfor %}
+    </h3>
+
+    <h6>Description:</h6>
+    <p>{{description}}</p>
+    <h6>Alternative_labels:</h6>
+    {% if altLabels %}
+      <p>{{altLabels}}</p>
+    {% else %}
+      <p><i>The suggestion has no alt_labels</i></p>
+    {% endif %}
+    <h6>Broader_labels:</h6>
+    {% if brdLabels %}
+      <p>{{brdLabels}}</p>
+    {% else %}
+      <p><i>The suggestion has no broader_labels</i></p>
+    {% endif %}
+    <h6>Created:</h6>
+    <p>{{created}}</p>
+    <h6>Modified:</h6>
+    <p>{{modified}}</p>
+    <h6>Tags:</h6>
+    {% if tagsForSugInFront %}
+      {% for tag in tagsForSugInFront: %}
+        - {{tag}} <br>
+      {% endfor %}
+    {% else %}
+      <p><i>The suggestion has no tags</i></p>
+    {% endif %}
+    <p>&nbsp</p>
+    <b>Comments:</b> <br>
+    {% if commentsToBeShown %}
+      {% for comment in commentsToBeShown: %}
+        {{comment}}<br>
+      {% endfor %}
+    {% else%}
+      <p><i>The suggestion has no comments</i></p>
+    {% endif%}
+
+{% endblock %}
