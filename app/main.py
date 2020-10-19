@@ -89,6 +89,51 @@ def create_app(testing: bool = True):
         testing = True
         return f'Just for test purposes: {responseForAPITesting.text}'
 
+    @app.route("/suggestion/<suggestionId>", methods=["POST", "GET"])
+    def suggestion(suggestionId):
+        allData = json.loads(requests.get(f'{baseURL}suggestions/{suggestionId}').text)['data']
+        alternativeLabels = {}
+        langPrefLabelsDict = {}
+        prefLabelsArray = []
+        preferredLabel = allData['preferred_label']
+        if 'fi' in preferredLabel:
+            langPrefLabelsDict['finnish'] = allData['preferred_label']['fi']['value']
+        if 'sv' in preferredLabel:
+            langPrefLabelsDict['swedish'] = allData['preferred_label']['sv']['value']
+        if 'en' in preferredLabel:
+            langPrefLabelsDict['english'] = allData['preferred_label']['en']['value']
+        prefLabelsArray.append(langPrefLabelsDict)
+        tagsForSug = allData['tags']
+        alternativeLabels = allData['alternative_labels']
+        broaderLabels = allData['broader_labels']
+        creat = allData['created']
+        modif = allData['modified']
+        desc = allData['description']
+        events = allData['events']
+        commentsToBeShownInFront = []
+        comments = {}
+        for event in events:
+            if 'COMMENT' in event['event_type']:
+                comments['created'] = event['created']
+                comments['text'] = event['text']
+                comments['value'] = event['value']
+                comments['user_id'] = event['user_id']
+                comments['reactions'] = event['reactions']
+                comments['tags'] = event['tags']
+                commentsToBeShownInFront.append(comments)
+        return render_template("suggestion.html",
+        prefLabels = prefLabelsArray,
+        suggestionId=suggestionId,
+        altLabels = alternativeLabels,
+        brdLabels = broaderLabels,
+        created = creat,
+        modified = modif,
+        description = desc,
+        eves = events,
+        commentsToBeShown = commentsToBeShownInFront,
+        tagsForSugInFront = tagsForSug,
+        )
+
     @app.route("/login/", methods=['GET', 'POST'])
     def login():
         # utilities.checkTokensAndRefresh2()
