@@ -20,6 +20,10 @@ def create_app(testing: bool = True):
 
     @app.route("/suggestionlisting/<sorting>/<filters>/<searchString>")
     def suggestion_list(sorting, filters, searchString):
+        # Testing area
+        statusUrl = f'{baseURL}suggestions/1/status/RECEIVED'
+        changeTheStatusAsATest('PUT', statusUrl)
+
         # Use the next following url information to compose a comprehensive comment section
         # http://localhost:5000/suggestionlisting/DEFAULT/tluafed/tluafed
         # http://localhost:8080/suggestions/?filters=status:received|type:new|tags:slm musiikki&search=sovit&sort=CREATED_ASC
@@ -82,12 +86,10 @@ def create_app(testing: bool = True):
 
     @app.route("/testurl")
     def common_tester_for_developers():
-        checkTokensAndRefresh(True)
         headerForAPITesting = settings['commonHeader']; headerForAPITesting.update({"Authorization": session.get("aToken")}); responseForAPITesting = requests.put('http://localhost:8080/api/suggestions/1/status/RECEIVED', headers=headerForAPITesting)
-        print('Just for test purposes:\n' + responseForAPITesting.text)
-
+        print('Checking and maintaining the authorization: \n' + responseForAPITesting.text)
         testing = True
-        return f'Just for test purposes: {responseForAPITesting.text}'
+        return f'Checking and maintaining the authorization: {responseForAPITesting.text}'
 
     @app.route("/suggestion/<suggestionId>", methods=["POST", "GET"])
     def suggestion(suggestionId):
@@ -136,7 +138,6 @@ def create_app(testing: bool = True):
 
     @app.route("/login/", methods=['GET', 'POST'])
     def login():
-        # utilities.checkTokensAndRefresh2()
         print(request.form.getlist("newUser"))
         if request.method == "POST":
             # Logout: Uses API Enpoint /logout
@@ -196,31 +197,31 @@ def create_app(testing: bool = True):
         else:
             return render_template("login.html", access='userCredentialsOperationFailed', refresh='userCredentialsOperationFailed')
 
-    def checkTokensAndRefresh(writeALog = False):
-        # The function is used to check whether the access_token is expired or if the user is allowed to perform actions in API
-        # The function is used every time you use POST, PUT or PATCH API calls
-        # If the access_token is expired, the refresh_token is used to get a new access_token
-        if len(session.get("aToken")) > 100:
-            if writeALog == True:
-                print("Before the check: access_token / refresh_token"); print(session.get("aToken")); print(session.get("rToken"))
-            headerForTokenTesting = settings['commonHeader']; headerForTokenTesting.update({"Authorization": session.get("aToken")}); responseForTokenTesting = requests.put('http://localhost:8080/api/suggestions/1/status/RECEIVED', headers=headerForTokenTesting)
-            if '202' not in responseForTokenTesting.text:
-                print("No valid tokens")
-                urlForRefresh = "http://localhost:8080/api/refresh"; headersForRefresh = settings['commonHeader']; headersForRefresh.update({'Authorization' : 'Bearer ' + session.get("rToken")}); dataForRefresh = {"refresh_token": session.get("rToken")}
-                responseForRefresh = requests.post(urlForRefresh, data=json.dumps(dataForRefresh), headers=headersForRefresh).text
-                seedDataForReLogin=json.loads(responseForRefresh)
-                session['aToken'] = 'Bearer ' + seedDataForReLogin['access_token']
+    def refresh_tokens_if_not_202(original_function):
+        def wrapper_function(*args, **kwargs):
+            if len(session.get("aToken")) > 100:
+                if '202' not in original_function(*args, **kwargs):
+                    print("No valid tokens")
+                    urlForRefresh = "http://localhost:8080/api/refresh"
+                    headersForRefresh = settings['commonHeader']
+                    headersForRefresh.update({'Authorization' : 'Bearer ' + session.get("rToken")})
+                    dataForRefresh = {"refresh_token": session.get("rToken")}
+                    responseForRefresh = requests.post(urlForRefresh, data=json.dumps(dataForRefresh), headers=headersForRefresh).text
+                    print(responseForRefresh)
+                    seedDataForReLogin=json.loads(responseForRefresh)
+                    session['aToken'] = 'Bearer ' + seedDataForReLogin['access_token']
+                    print("After the check: access_token / refresh_token"); print(session.get("aToken"))
+                    print(session.get("rToken"))
+                else:
+                    print("Tokens are valid")
             else:
-                print("Tokens are valid")
-            if writeALog == True:
-                print("After the check: access_token / refresh_token"); print(session.get("aToken")); print(session.get("rToken"))
-            return None
-        else:
-            print("No tokens found")
+                print("No tokens found. The function cannot be run")
+            return original_function(*args, **kwargs)
+        return wrapper_function
 
-    # @app.route("/nimi/<name>")
-    # def test(name):
-    #     print(baseURL)
-    #     return render_template("index.html", name=name)
+    @refresh_tokens_if_not_202
+    def changeTheStatusAsATest(method, url):
+        responseForTokenTesting = requests.request(method, url)
+        return responseForTokenTesting
 
     return app
