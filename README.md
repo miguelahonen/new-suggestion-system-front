@@ -1,6 +1,6 @@
-## Finto-Suggestion / Front
+# Finto-Suggestion / Front
 
-# Without Docker from the console:
+## Without Docker from the console:
 
 How to install:
 1) sudo apt-get install python3-pip
@@ -17,7 +17,7 @@ How to run:
 sudo gunicorn -w 4 --reload -b localhost:5000 "app.main:create_app(testing=False)"
 
 
-# With Docker:
+## With Docker:
 
 In root folder:
 
