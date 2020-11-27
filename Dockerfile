@@ -6,6 +6,3 @@ RUN pip3 install -r requirements.txt
 ADD . /app
 EXPOSE 5000
 ENTRYPOINT ["gunicorn", "--config", "gunicorn_config.py", "app.main:create_app(testing=False)"]
-
-#sudo gunicorn -w 4 --reload -b localhost:5000 "app.main:create_app(testing=False)"
-#ENTRYPOINT ["gunicorn", "--config", "gunicorn_config.py", "app.wsgi:app"]
