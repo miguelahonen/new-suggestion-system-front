@@ -4,5 +4,7 @@ WORKDIR /app
 ADD requirements.txt /app
 RUN pip3 install -r requirements.txt
 ADD . /app
+ENV PYTHONUNBUFFERED 0
+ENV TZ "Europe/Helsinki"
 EXPOSE 5000
-ENTRYPOINT ["gunicorn", "--config", "gunicorn_config.py", "app.main:create_app(testing=False)"]
+ENTRYPOINT ["gunicorn", "--config", "gunicorn_config.py", "--log-config", "logging.conf", "--log-level", "debug", "app.main:create_app(testing=False)"]

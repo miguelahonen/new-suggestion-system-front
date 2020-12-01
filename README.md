@@ -24,3 +24,9 @@ In root folder:
 docker build --tag flask-app .
 
 docker run -p 5000:5000 --net="host" flask-app
+
+## How to access the container:
+
+While the container is running:
+- docker ps
+- docker exec -it [name of your container] sh
