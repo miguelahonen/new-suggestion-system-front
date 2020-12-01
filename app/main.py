@@ -7,15 +7,17 @@ import os
 
 
 def create_app(testing: bool = True):
-    app = Flask(__name__, template_folder='../templates')
     settings = json.load(open(f'{os.getcwd()}/conf/siteSettings.json')) # Check if the opened file should be closed
+    app = Flask(__name__, template_folder='../templates')
+    app.config['DEBUG'] = True
     baseURL = settings['apiBasePath']
     app.secret_key = str(settings['secretKey'])
 
     @app.route("/")
     def index():
+        print("Alkaako näkyä lokissa")
         testing = True
-        return f'Will be a main page: {testing}'
+        return f'Will be a main page etc: {testing}'
         # return render_template("index.html", testing=testing)
 
     @app.route("/suggestionlisting/<sorting>/<filters>/<searchString>")
@@ -222,6 +224,7 @@ def create_app(testing: bool = True):
     @refresh_tokens_if_not_202
     def changeTheStatusAsATest(method, url):
         responseForTokenTesting = requests.request(method, url)
-        return responseForTokenTesting
+        print(responseForTokenTesting.text)
+        return responseForTokenTesting.text
 
     return app

@@ -12,5 +12,8 @@
 	"commonHeader": {
 		"Content-type": "application/json",
 		"Accept": "application/json"
+	},
+	"debugMode": {
+		"isItDebugged": "True"
 	}
 }
