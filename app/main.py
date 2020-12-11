@@ -10,14 +10,15 @@ def create_app(testing: bool = True):
     settings = json.load(open(f'{os.getcwd()}/conf/siteSettings.json')) # Check if the opened file should be closed
     app = Flask(__name__, template_folder='../templates')
     app.config['DEBUG'] = True
+    app.jinja_env.auto_reload = True
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     baseURL = settings['apiBasePath']
     app.secret_key = str(settings['secretKey'])
 
     @app.route("/")
     def index():
-        print("Alkaako näkyä lokissa")
         testing = True
-        return f'Will be a main page etc: {testing}'
+        return f'Will be a main page: {testing}'
         # return render_template("index.html", testing=testing)
 
     @app.route("/suggestionlisting/<sorting>/<filters>/<searchString>")
@@ -204,6 +205,7 @@ def create_app(testing: bool = True):
             if len(session.get("aToken")) > 100:
                 if '202' not in original_function(*args, **kwargs):
                     print("No valid tokens")
+                    print("Ollaanko tässä?")
                     urlForRefresh = "http://localhost:8080/api/refresh"
                     headersForRefresh = settings['commonHeader']
                     headersForRefresh.update({'Authorization' : 'Bearer ' + session.get("rToken")})
