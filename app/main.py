@@ -3,8 +3,6 @@ from itertools import chain
 import requests
 import json
 import os
-# import re
-
 
 def create_app(testing: bool = True):
     settings = json.load(open(f'{os.getcwd()}/conf/siteSettings.json')) # Check if the opened file should be closed
@@ -24,8 +22,10 @@ def create_app(testing: bool = True):
     @app.route("/suggestionlisting/<sorting>/<filters>/<searchString>")
     def suggestion_list(sorting, filters, searchString):
         # Testing area
-        statusUrl = f'{baseURL}suggestions/1/status/RECEIVED'
+        statusUrl = f'{baseURL}suggestions/1/status/ACCEPTED'
+        # statusUrl = f'{baseURL}suggestions/1/status/RECEIVED'
         changeTheStatusAsATest('PUT', statusUrl)
+        # Testing area ends
 
         # Use the next following url information to compose a comprehensive comment section
         # http://localhost:5000/suggestionlisting/DEFAULT/tluafed/tluafed
@@ -203,18 +203,20 @@ def create_app(testing: bool = True):
     def refresh_tokens_if_not_202(original_function):
         def wrapper_function(*args, **kwargs):
             if len(session.get("aToken")) > 100:
+                print("You entered the wrapper...")
                 if '202' not in original_function(*args, **kwargs):
-                    print("No valid tokens")
-                    print("Ollaanko tässä?")
+                    print("No valid tokens. We are going to have new ones")
                     urlForRefresh = "http://localhost:8080/api/refresh"
                     headersForRefresh = settings['commonHeader']
                     headersForRefresh.update({'Authorization' : 'Bearer ' + session.get("rToken")})
                     dataForRefresh = {"refresh_token": session.get("rToken")}
                     responseForRefresh = requests.post(urlForRefresh, data=json.dumps(dataForRefresh), headers=headersForRefresh).text
-                    print(responseForRefresh)
                     seedDataForReLogin=json.loads(responseForRefresh)
                     session['aToken'] = 'Bearer ' + seedDataForReLogin['access_token']
-                    print("After the check: access_token / refresh_token"); print(session.get("aToken"))
+                    print("After the check and token update")
+                    print("New access_token:")
+                    print(session.get("aToken"))
+                    print("New refresh_token:")
                     print(session.get("rToken"))
                 else:
                     print("Tokens are valid")
@@ -225,7 +227,13 @@ def create_app(testing: bool = True):
 
     @refresh_tokens_if_not_202
     def changeTheStatusAsATest(method, url):
-        responseForTokenTesting = requests.request(method, url)
+        # For testing purposes
+        # Tries to set up values as requested
+        # Applicable for all the methods and urls
+        headersForStatusChange = settings['commonHeader']
+        headersForStatusChange.update({"Authorization": session.get("aToken")})
+        print(headersForStatusChange)
+        responseForTokenTesting = requests.request(method, url, headers=headersForStatusChange)
         print(responseForTokenTesting.text)
         return responseForTokenTesting.text
 
